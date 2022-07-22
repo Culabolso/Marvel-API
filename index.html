@@ -1,0 +1,222 @@
+<html>
+<head>
+    
+<style>
+
+* /* Todo o bloco externo */
+{
+
+    margin: 0;
+    padding: 0;
+    background-color: black;
+
+}
+.cabecalho /* Toda a primeira linha que aparece na pagina */
+{
+
+    padding-left: 30px;
+    text-align: left;
+    background-color: rgb(238, 0, 0);
+
+}    
+.cabecalho img/* Minha imagem dentro do cabeçalho */
+{
+    
+    width: 150px;
+    border-color: white;
+
+}
+
+.pesquisa /* todo o bloco da minha segunda linha onde eu faço a minha pesquisa por personagens */
+{
+
+    text-align: left;
+    padding: 20px;
+    padding-top: 12px;
+    
+}
+.informacao /* ediçao da minha caixa de pesquisa */
+{
+
+    text-align: center;
+    background-color: white;
+    color: black;
+    padding: 3px;
+    border-radius: 10px;
+    border-style: solid;
+}
+.personagens  /* ediçao dos blocos dos personagens */
+{
+    
+    width: 300px;
+    margin: 20px;
+    border-style: solid;
+    border-radius: 16px;
+    text-align: center;
+    border-color: purple;
+    color: white;
+    
+}
+.personagens img /* ediçao das imagens dos personagens */
+{
+    height: 300px;
+    width: 300px;
+    border-bottom-style: solid;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-color: purple;
+}
+
+
+
+</style>
+
+</head>
+<body>
+    
+<div class="cabecalho">
+
+<img opt = "imagemDoLogo" src = LogoMarvel.png>
+
+</div>
+
+<div class="pesquisa">
+<input class = "informacao" type = "text" placeholder="nome do personagem" name = "nomePersonagem"  />
+
+</div>
+
+<div class="heros" id="herois" style="
+
+    display: inline-flex;                     
+    flex-wrap: wrap;
+    justify-content: space-between;
+">
+
+</div>
+
+
+
+<script>
+
+var controle  = true;
+
+
+//Constantes da minha chave para acessar o link
+const timeStamp = "1657906271";
+const apikeyP   = "2282357bf04d46b6a766a80600f44557";
+const md5       = "d0fb8e8740c3008363b2eaf5502d44c5";
+
+//Variaveis para o controle da pesquisa do link
+var nomeC = "a";
+var limitador = 10;
+
+//Constantes dos elementos que eu pego do html
+const nomeDiv   = document.querySelector("input[name=nomePersonagem]");//Barra de pesquisa dos personagens
+const divHero   = document.querySelector("#herois");
+
+
+nomeDiv.addEventListener("keyup", ()=> //Função que se ativa quando eu atualizo os caracteres
+{
+
+if(controle == 1)//Aqui e uma forma de eu poder verificar se o codigo já foi rodado ao menos uma vez se não foi ele executa as ações abaixo
+{
+
+    nomeC = nomeDiv.value;//Declara que minha variavel que muda o link vai receber o valor da minha variavel que eu faço minha pesquisa
+
+    pesquisar();//Chama a funçao que ira fazer a pesquisa
+
+    console.log(nomeDiv.value);//So um controle para que eu possa ver se esta tudo certo com o valor retornado da minha pesquisa
+
+}
+
+else if(controle == 2)//Aqui e uma forma de eu poder verificar se o codigo já foi rodado ao menos uma vez se foi ele executa as ações abaixo
+{
+
+    nomeC = nomeDiv.value;//Declara que minha variavel que muda o link vai receber o valor da minha variavel que eu faço minha pesquisa 
+    
+    
+    apagar();//Chama a função de apagar
+    pesquisar();//Chama a função de pesquisar
+
+    console.log(nomeDiv.value);//Controle para ver se o nome do personagem cujo o qual ira fazer a pesquisa esta certo
+
+};
+}); 
+
+function pesquisar() //Funçao que pesquisa as informaçoes
+{
+    
+    fetch(`https://gateway.marvel.com:/v1/public/characters?nameStartsWith=${nomeC}&ts=${timeStamp}&apikey=${apikeyP}&hash=${md5}&limit=${limitador}`
+
+    ).then((response) =>
+{
+
+    return response.json();
+
+    }).then((jsonParsed) => 
+{
+
+
+jsonParsed.data.results.forEach(element => //A partir daqui o loop vai rodar dependendo da quantidade de personagens 
+{ 
+    
+    const srcImage = element.thumbnail.path + "." + element.thumbnail.extension;//Aqui eu pego o link da minha imagem 
+    const nameHero = element.name;//Aqui eu pego o nome 
+
+
+    creteDivHero(srcImage, nameHero, divHero)//Chamo a função de criação das div onde ficaram os personagens
+
+});
+//f do loop
+
+    console.log(jsonParsed);//Controle para eu poder ver se esta retornando certinho os personagens 
+
+});
+
+    console.log("pesquisando")//Controle para que eu possa ver se esta efetuando a pesquisa
+};
+//f da função pesquisar
+
+
+
+function creteDivHero(srcImage, nameHero, divHero) //Funçao de criar as div dos personagens
+{
+
+    //Costantes de criação dos elementos e divs
+    const div1 = document.createElement("div");//Crio minha div1
+    const nome = document.createElement("text");//Crio o elemento nome
+    const img  = document.createElement("img");//Crio o elemento img
+
+    //Definem as informações que eu vou precisar para colocar nas minhas divs
+    nome.textContent = nameHero;//Faz com que o elemento que eu criei "nome" receba o valor de nameHero no seu textContent 
+    img.src = srcImage;//Faz com que o elemento que eu criei "img" receba o valor de srcImage no seu src
+
+    //Aglomera as informações dentro de uma div depois pega essa div e coloca dentro de outra para que possa crirar todas as caixas de informações
+    div1.appendChild(img);//Faz com que a minha "img" fique dentro da minha div1
+    div1.appendChild(nome);//Faz com que o meu "nome" fique dentro da minha div1
+    divHero.appendChild(div1);//Faz com que a div1 fique dentro da minha divhero
+
+    div1.classList.add("personagens");//Adiciona uma class para minha div1
+
+    controle = 2;//Variavel de controle para poder saber se meu codigo ja foi rodado ao menos uma vez
+
+    console.log(div1);//Controle para que eu veja se os resultados estão vindo corretamente
+    console.log(divHero);//Controle para que eu veja se os resultados estão vindo corretamente
+    console.log("sim")//Controle para ver se a função de criação esta tudo certo
+    
+};
+
+function apagar()//Aqui eu excluo a div assim sumindo os resultados
+{
+
+    divHero.innerText = "";//Apaga todos os nós filhos de divHero e o substitui por ""
+
+    console.log("apagando");//Controle para que eu possa ver se esta apagando certinho
+
+};
+
+
+
+</script>
+</body>
+</html>
